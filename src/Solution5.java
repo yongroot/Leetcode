@@ -1,7 +1,6 @@
 package leecode;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 /**
  * 5. 最长回文子串
@@ -10,11 +9,13 @@ public class Solution5 {
 
     public static void main(String[] args) {
         Solution5 s = new Solution5();
-        System.out.println(s.longestPalindrome("上海自来水来自海上"));
+        System.out.println(s.longestPalindrome2("aaaaa"));
+        System.out.println(s.longestPalindrome2("ababababa"));
+        System.out.println(s.longestPalindrome2("jjhg上海自来水来自海上oo"));
     }
 
     /**
-     * 使用双指针穷举
+     * 使用双指针(从外到内)穷举
      */
     public String longestPalindrome(String s) {
         if (s == null || s.isEmpty()) {
@@ -36,6 +37,11 @@ public class Solution5 {
         int start = 0;
         for (int i = 0; i + maxLength < length; i++) {
             List<Integer> indexArr = indexCache.get(chars[i]);
+//            if (indexArr != null) {
+//                indexCache.put(chars[i], null);
+//            } else {
+//                continue;
+//            }
             for (int j = indexArr.size() - 1; j >= 0; j--) {
                 int left = i;
                 int right = indexArr.get(j);
@@ -52,6 +58,7 @@ public class Solution5 {
                             maxLength = w;
                             start = i;
                         }
+                        break;
                     } else {
                         left++;
                         right--;
@@ -60,6 +67,37 @@ public class Solution5 {
             }
         }
         return s.substring(start, start + maxLength + 1);
+    }
+
+    /**
+     * 使用双指针(从内到外)穷举
+     */
+    public String longestPalindrome2(String s) {
+        if (s == null || s.isEmpty()) {
+            return s;
+        }
+        if (s.length() == 1) {
+            return s;
+        }
+        char[] chars = s.toCharArray();
+        int[] max = new int[2];
+        for (int i = 0; i < chars.length; i++) {
+            maxLength(chars, i, i, max);
+            maxLength(chars, i, i + 1, max);
+        }
+        return s.substring(max[0], max[1]+1);
+    }
+
+    void maxLength(char[]arr, int i, int right, int[]max) {
+        int left = i, /*right = i+1,*/ l = i, r = i;
+        while (left >=0 && right < arr.length && arr[left] == arr[right]) {
+            l = left--;
+            r = right++;
+        }
+        if ((r - l) > (max[1] - max[0])) {
+            max[0] = l;
+            max[1] = r;
+        }
     }
 }
 
