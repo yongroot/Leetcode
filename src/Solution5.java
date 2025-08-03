@@ -9,13 +9,15 @@ public class Solution5 {
 
     public static void main(String[] args) {
         Solution5 s = new Solution5();
-        System.out.println(s.longestPalindrome2("aaaaa"));
-        System.out.println(s.longestPalindrome2("ababababa"));
-        System.out.println(s.longestPalindrome2("jjhg上海自来水来自海上oo"));
+        System.out.println(s.longestPalindrome3("abcda"));
+        System.out.println(s.longestPalindrome3("babad"));
+        System.out.println(s.longestPalindrome3("aaaaa"));
+        System.out.println(s.longestPalindrome3("ababababa"));
+        System.out.println(s.longestPalindrome3("jjhg上海自来水来自海上oo"));
     }
 
     /**
-     * 使用双指针(从外到内)穷举
+     * 使用双指针(收敛)
      */
     public String longestPalindrome(String s) {
         if (s == null || s.isEmpty()) {
@@ -70,7 +72,7 @@ public class Solution5 {
     }
 
     /**
-     * 使用双指针(从内到外)穷举
+     * 使用双指针(扩散)
      */
     public String longestPalindrome2(String s) {
         if (s == null || s.isEmpty()) {
@@ -98,6 +100,46 @@ public class Solution5 {
             max[0] = l;
             max[1] = r;
         }
+    }
+
+    /**
+     * 动态规划
+     */
+    public String longestPalindrome3(String s) {
+        if (s == null || s.length() <=1) {
+            return s;
+        }
+        char[] chars = s.toCharArray();
+        int length = chars.length;
+        if (length == 2) {
+            return chars[0] == chars[1] ? s : String.valueOf(chars[0]);
+        }
+
+        // dp[i][j] = dp[i+1][j-1] && chars[i]==chars[j]
+        boolean[][] dp = new boolean[length][length];
+
+        // init
+        for (int i = 0; i < length; i++) dp[i][i] = true;
+        for (int i = 1; i < length; i++) dp[i-1][i] = chars[i-1] == chars[i];
+
+
+        // 依赖左下角结果
+        // 从下往上，从右往左遍历
+        for (int i = length-3; i >= 0; i--) {
+            for (int j = i+2; j < length; j++) {
+                dp[i][j] = dp[i+1][j-1] && chars[i]==chars[j];
+            }
+        }
+
+        // 从右上角开始朝左下角遍历
+        for (int j = length-1, m = j; j > 0; j--, m=j) {
+            for (int i = 0; m < length && i < length; i++, m++) {
+                if (dp[i][m]) {
+                    return s.substring(i, m + 1);
+                }
+            }
+        }
+        return String.valueOf(chars[0]);
     }
 }
 
